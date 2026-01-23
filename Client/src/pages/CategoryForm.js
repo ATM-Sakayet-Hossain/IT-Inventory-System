@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
@@ -25,19 +25,7 @@ export default function CategoryForm() {
     description: '',
   });
 
-  useEffect(() => {
-    if (!isITStaff) {
-      toast.error('Access denied');
-      navigate('/categories');
-      return;
-    }
-
-    if (isEdit) {
-      fetchCategory();
-    }
-  }, [id, isITStaff, isEdit, navigate]);
-
-  const fetchCategory = async () => {
+  const fetchCategory = useCallback(async () => {
     try {
       const response = await axios.get('/api/categories');
       const category = response.data.data.find(cat => cat._id === id);
@@ -54,7 +42,19 @@ export default function CategoryForm() {
       toast.error('Failed to load category');
       navigate('/categories');
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (!isITStaff) {
+      toast.error('Access denied');
+      navigate('/categories');
+      return;
+    }
+
+    if (isEdit) {
+      fetchCategory();
+    }
+  }, [isITStaff, isEdit, navigate, fetchCategory]);
 
   const handleChange = (e) => {
     setFormData({

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Paper,
@@ -12,14 +11,13 @@ import {
   Divider,
   Chip,
 } from '@mui/material';
-import { AccountCircle as AccountCircleIcon } from '@mui/icons-material';
+
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 
 export default function Profile() {
-  const navigate = useNavigate();
-  const { user, logout, refreshUser } = useContext(AuthContext);
+  const { user, refreshUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',

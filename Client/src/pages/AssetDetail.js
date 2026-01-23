@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -34,11 +34,7 @@ export default function AssetDetail() {
   const [asset, setAsset] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAsset();
-  }, [id]);
-
-  const fetchAsset = async () => {
+  const fetchAsset = useCallback(async () => {
     try {
       const response = await axios.get(`/api/assets/${id}`);
       setAsset(response.data.data);
@@ -48,7 +44,11 @@ export default function AssetDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    fetchAsset();
+  }, [fetchAsset]);
 
   if (loading) {
     return (

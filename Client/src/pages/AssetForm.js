@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
@@ -40,14 +40,6 @@ export default function AssetForm() {
     description: '',
   });
 
-  useEffect(() => {
-    fetchCategories();
-    fetchVendors();
-    if (isEdit) {
-      fetchAsset();
-    }
-  }, [id]);
-
   const fetchCategories = async () => {
     try {
       const response = await axios.get('/api/categories');
@@ -66,7 +58,7 @@ export default function AssetForm() {
     }
   };
 
-  const fetchAsset = async () => {
+  const fetchAsset = useCallback(async () => {
     try {
       const response = await axios.get(`/api/assets/${id}`);
       const asset = response.data.data;
@@ -89,7 +81,15 @@ export default function AssetForm() {
       toast.error('Failed to load asset');
       navigate('/assets');
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchVendors();
+    if (isEdit) {
+      fetchAsset();
+    }
+  }, [isEdit, fetchAsset]);
 
   const handleChange = (e) => {
     setFormData({

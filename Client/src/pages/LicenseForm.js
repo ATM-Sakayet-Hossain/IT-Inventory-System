@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
@@ -39,18 +39,6 @@ export default function LicenseForm() {
     notes: '',
   });
 
-  useEffect(() => {
-    if (!isITStaff) {
-      toast.error('Access denied');
-      navigate('/licenses');
-      return;
-    }
-    fetchVendors();
-    if (isEdit) {
-      fetchLicense();
-    }
-  }, [id, isITStaff, isEdit, navigate]);
-
   const fetchVendors = async () => {
     try {
       const response = await axios.get('/api/vendors');
@@ -60,7 +48,7 @@ export default function LicenseForm() {
     }
   };
 
-  const fetchLicense = async () => {
+  const fetchLicense = useCallback(async () => {
     try {
       const response = await axios.get('/api/licenses');
       const license = response.data.data.find(l => l._id === id);
@@ -85,7 +73,19 @@ export default function LicenseForm() {
       toast.error('Failed to load license');
       navigate('/licenses');
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (!isITStaff) {
+      toast.error('Access denied');
+      navigate('/licenses');
+      return;
+    }
+    fetchVendors();
+    if (isEdit) {
+      fetchLicense();
+    }
+  }, [isITStaff, isEdit, navigate, fetchLicense]);
 
   const handleChange = (e) => {
     setFormData({

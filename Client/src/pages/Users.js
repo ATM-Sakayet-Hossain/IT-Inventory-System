@@ -29,7 +29,7 @@ const roleColors = {
 
 export default function Users() {
   const navigate = useNavigate();
-  const { isITStaff, isAdmin } = useContext(AuthContext);
+  const { isAdmin } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
