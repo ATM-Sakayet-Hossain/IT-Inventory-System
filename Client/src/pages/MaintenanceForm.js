@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
@@ -42,14 +42,6 @@ export default function MaintenanceForm() {
     nextMaintenanceDate: '',
   });
 
-  useEffect(() => {
-    fetchAssets();
-    fetchVendors();
-    if (isEdit) {
-      fetchMaintenance();
-    }
-  }, [id, isEdit, navigate]);
-
   const fetchAssets = async () => {
     try {
       const response = await axios.get('/api/assets', { params: { limit: 1000 } });
@@ -68,7 +60,7 @@ export default function MaintenanceForm() {
     }
   };
 
-  const fetchMaintenance = async () => {
+  const fetchMaintenance = useCallback(async () => {
     try {
       const response = await axios.get('/api/maintenance');
       const record = response.data.data.find(m => m._id === id);
@@ -96,7 +88,15 @@ export default function MaintenanceForm() {
       toast.error('Failed to load maintenance record');
       navigate('/maintenance');
     }
-  };
+  }, [id, navigate, user?.role]);
+
+  useEffect(() => {
+    fetchAssets();
+    fetchVendors();
+    if (isEdit) {
+      fetchMaintenance();
+    }
+  }, [isEdit, fetchMaintenance]);
 
   const handleChange = (e) => {
     setFormData({

@@ -12,7 +12,6 @@ import {
   Inventory as InventoryIcon,
   People as PeopleIcon,
   Assignment as AssignmentIcon,
-  Build as BuildIcon,
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import axios from 'axios';

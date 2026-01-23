@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
@@ -34,17 +34,7 @@ export default function MaintenanceAssign() {
     startDate: '',
   });
 
-  useEffect(() => {
-    if (!isAdmin) {
-      toast.error('Access denied. Admin only.');
-      navigate('/maintenance');
-      return;
-    }
-    fetchMaintenance();
-    fetchUsers();
-  }, [id, isAdmin, navigate]);
-
-  const fetchMaintenance = async () => {
+  const fetchMaintenance = useCallback(async () => {
     try {
       const response = await axios.get('/api/maintenance');
       const record = response.data.data.find(m => m._id === id);
@@ -66,7 +56,17 @@ export default function MaintenanceAssign() {
       toast.error('Failed to load maintenance record');
       navigate('/maintenance');
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (!isAdmin) {
+      toast.error('Access denied. Admin only.');
+      navigate('/maintenance');
+      return;
+    }
+    fetchMaintenance();
+    fetchUsers();
+  }, [isAdmin, navigate, fetchMaintenance]);
 
   const fetchUsers = async () => {
     try {

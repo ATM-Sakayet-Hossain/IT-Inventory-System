@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -54,11 +54,6 @@ export default function Assets() {
   });
   const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    fetchCategories();
-    fetchAssets();
-  }, [page, rowsPerPage, filters]);
-
   const fetchCategories = async () => {
     try {
       const response = await axios.get('/api/categories');
@@ -68,7 +63,7 @@ export default function Assets() {
     }
   };
 
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     setLoading(true);
     try {
       const params = {
@@ -84,7 +79,12 @@ export default function Assets() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage, filters]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchAssets();
+  }, [fetchAssets]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

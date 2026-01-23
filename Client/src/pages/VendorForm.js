@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
@@ -33,19 +33,7 @@ export default function VendorForm() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (!isITStaff) {
-      toast.error('Access denied');
-      navigate('/vendors');
-      return;
-    }
-
-    if (isEdit) {
-      fetchVendor();
-    }
-  }, [id, isITStaff, isEdit, navigate]);
-
-  const fetchVendor = async () => {
+  const fetchVendor = useCallback(async () => {
     try {
       const response = await axios.get('/api/vendors');
       const vendor = response.data.data.find(v => v._id === id);
@@ -67,7 +55,19 @@ export default function VendorForm() {
       toast.error('Failed to load vendor');
       navigate('/vendors');
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (!isITStaff) {
+      toast.error('Access denied');
+      navigate('/vendors');
+      return;
+    }
+
+    if (isEdit) {
+      fetchVendor();
+    }
+  }, [isITStaff, isEdit, navigate, fetchVendor]);
 
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;

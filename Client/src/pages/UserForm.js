@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Box,
@@ -37,19 +37,7 @@ export default function UserForm() {
     isActive: true,
   });
 
-  useEffect(() => {
-    if (!isAdmin) {
-      toast.error('Access denied. Admin only.');
-      navigate('/users');
-      return;
-    }
-
-    if (isEdit) {
-      fetchUser();
-    }
-  }, [id, isAdmin, isEdit, navigate]);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const response = await axios.get(`/api/users/${id}`);
       const user = response.data.data;
@@ -66,7 +54,19 @@ export default function UserForm() {
       toast.error('Failed to load user');
       navigate('/users');
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (!isAdmin) {
+      toast.error('Access denied. Admin only.');
+      navigate('/users');
+      return;
+    }
+
+    if (isEdit) {
+      fetchUser();
+    }
+  }, [isAdmin, isEdit, navigate, fetchUser]);
 
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
