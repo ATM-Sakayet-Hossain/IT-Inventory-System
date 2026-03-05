@@ -1,5 +1,22 @@
 const mongoose = require('mongoose');
 
+const HardwareSpecificationsSchema = new mongoose.Schema(
+  {
+    ram: { type: String, trim: true },
+    cpu: { type: String, trim: true },
+    cpuGeneration: { type: String, trim: true },
+    ssdSize: { type: String, trim: true },
+    hddSize: { type: String, trim: true },
+    motherboard: { type: String, trim: true },
+    motherboardModel: { type: String, trim: true },
+    gpu: { type: String, trim: true },
+    macAddress: { type: String, trim: true },
+    ipAddress: { type: String, trim: true },
+    monitorSize: { type: String, trim: true }
+  },
+  { _id: false }
+);
+
 const AssignmentSchema = new mongoose.Schema({
   asset: {
     type: mongoose.Schema.Types.ObjectId,
@@ -8,8 +25,12 @@ const AssignmentSchema = new mongoose.Schema({
   },
   assignedTo: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
+  },
+  // Free-text assignee name for manual assignments
+  assignToName: {
+    type: String,
+    trim: true
   },
   assignedBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +52,11 @@ const AssignmentSchema = new mongoose.Schema({
     type: String,
     enum: ['Excellent', 'Good', 'Fair', 'Poor'],
     default: 'Good'
+  },
+  // Optional hardware snapshot at assignment time
+  hardwareSpecifications: {
+    type: HardwareSpecificationsSchema,
+    required: false
   },
   notes: {
     type: String,

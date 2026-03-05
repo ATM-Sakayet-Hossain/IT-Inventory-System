@@ -23,13 +23,26 @@ export default function AssignmentForm() {
   const { isITStaff } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [assets, setAssets] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [assetSearch, setAssetSearch] = useState('');
+  const [selectedAssets, setSelectedAssets] = useState([]);
   const [formData, setFormData] = useState({
-    asset: '',
-    assignedTo: '',
+    assignToName: '',
+    assignedDate: new Date().toISOString().split('T')[0],
     expectedReturnDate: '',
     condition: 'Good',
     notes: '',
+    // Optional hardware snapshot
+    ram: '',
+    cpu: '',
+    cpuGeneration: '',
+    ssdSize: '',
+    hddSize: '',
+    motherboard: '',
+    motherboardModel: '',
+    gpu: '',
+    macAddress: '',
+    ipAddress: '',
+    monitorSize: '',
   });
 
   useEffect(() => {
@@ -39,25 +52,28 @@ export default function AssignmentForm() {
       return;
     }
     fetchAssets();
-    fetchUsers();
   }, [isITStaff, navigate]);
 
   const fetchAssets = async () => {
     try {
-      const response = await axios.get('/api/assets', { params: { status: 'In Stock', limit: 1000 } });
+      const response = await axios.get('/api/assets', {
+        params: { status: 'In Stock', limit: 50 }
+      });
       setAssets(response.data.data);
     } catch (error) {
       console.error('Failed to load assets:', error);
     }
   };
 
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get('/api/users');
-      setUsers(response.data.data.filter(u => u.isActive));
-    } catch (error) {
-      console.error('Failed to load users:', error);
-    }
+  const handleAddAsset = (assetId) => {
+    const asset = assets.find((a) => a._id === assetId);
+    if (!asset) return;
+    if (selectedAssets.some((a) => a._id === assetId)) return;
+    setSelectedAssets((prev) => [...prev, asset]);
+  };
+
+  const handleRemoveAsset = (assetId) => {
+    setSelectedAssets((prev) => prev.filter((a) => a._id !== assetId));
   };
 
   const handleChange = (e) => {
@@ -72,8 +88,71 @@ export default function AssignmentForm() {
     setLoading(true);
 
     try {
-      await axios.post('/api/assignments', formData);
-      toast.success('Assignment created successfully');
+      if (selectedAssets.length === 0) {
+        toast.error('Please add at least one asset to the assignment');
+        setLoading(false);
+        return;
+      }
+      if (!formData.assignToName.trim()) {
+        toast.error('Assign To is required');
+        setLoading(false);
+        return;
+      }
+
+      const {
+        assignToName,
+        assignedDate,
+        expectedReturnDate,
+        condition,
+        notes,
+        ram,
+        cpu,
+        cpuGeneration,
+        ssdSize,
+        hddSize,
+        motherboard,
+        motherboardModel,
+        gpu,
+        macAddress,
+        ipAddress,
+        monitorSize,
+      } = formData;
+
+      const hardwareSpecifications = {
+        ram,
+        cpu,
+        cpuGeneration,
+        ssdSize,
+        hddSize,
+        motherboard,
+        motherboardModel,
+        gpu,
+        macAddress,
+        ipAddress,
+        monitorSize,
+      };
+
+      Object.keys(hardwareSpecifications).forEach((key) => {
+        if (!hardwareSpecifications[key]) {
+          delete hardwareSpecifications[key];
+        }
+      });
+
+      const payload = {
+        assets: selectedAssets.map((a) => a._id),
+        assignToName,
+        assignedDate: assignedDate || undefined,
+        expectedReturnDate: expectedReturnDate || undefined,
+        condition,
+        notes: notes || undefined,
+      };
+
+      if (Object.keys(hardwareSpecifications).length > 0) {
+        payload.hardwareSpecifications = hardwareSpecifications;
+      }
+
+      await axios.post('/api/assignments/bulk', payload);
+      toast.success('Assignments created successfully');
       navigate('/assignments');
     } catch (error) {
       const errorMessage =
@@ -99,38 +178,99 @@ export default function AssignmentForm() {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth required>
+                            <FormControl fullWidth required>
                 <InputLabel>Asset</InputLabel>
                 <Select
                   name="asset"
-                  value={formData.asset}
-                  onChange={handleChange}
+                  value=""
+                  onChange={(e) => {
+                    handleAddAsset(e.target.value);
+                  }}
                   label="Asset"
                 >
-                  {assets.map((asset) => (
-                    <MenuItem key={asset._id} value={asset._id}>
-                      {asset.assetTag} - {asset.name}
-                    </MenuItem>
-                  ))}
+                  {assets
+                    .filter((asset) => {
+                      const q = assetSearch.toLowerCase();
+                      if (!q) return true;
+                      return (
+                        asset.assetTag?.toLowerCase().includes(q) ||
+                        asset.name?.toLowerCase().includes(q) ||
+                        asset.serialNumber?.toLowerCase().includes(q)
+                      );
+                    })
+                    .map((asset) => (
+                      <MenuItem key={asset._id} value={asset._id}>
+                        {asset.assetTag} - {asset.name}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Assign To</InputLabel>
-                <Select
-                  name="assignedTo"
-                  value={formData.assignedTo}
-                  onChange={handleChange}
-                  label="Assign To"
-                >
-                  {users.map((user) => (
-                    <MenuItem key={user._id} value={user._id}>
-                      {user.name} ({user.email})
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <TextField
+                fullWidth
+                label="Assign To (User Name)"
+                name="assignToName"
+                value={formData.assignToName}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            {selectedAssets.length > 0 && (
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Selected Assets
+                </Typography>
+                <Paper variant="outlined">
+                  <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Asset Tag</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Product Name</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Brand</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Model</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Serial Number</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>State</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedAssets.map((asset) => (
+                          <tr key={asset._id}>
+                            <td style={{ padding: '8px' }}>{asset.assetTag}</td>
+                            <td style={{ padding: '8px' }}>{asset.name}</td>
+                            <td style={{ padding: '8px' }}>{asset.brand || 'N/A'}</td>
+                            <td style={{ padding: '8px' }}>{asset.model || 'N/A'}</td>
+                            <td style={{ padding: '8px' }}>{asset.serialNumber || 'N/A'}</td>
+                            <td style={{ padding: '8px' }}>{asset.status}</td>
+                            <td style={{ padding: '8px' }}>
+                              <Button
+                                size="small"
+                                color="error"
+                                onClick={() => handleRemoveAsset(asset._id)}
+                              >
+                                Remove
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </Box>
+                </Paper>
+              </Grid>
+            )}
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Assign Date"
+                name="assignedDate"
+                type="date"
+                value={formData.assignedDate}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
+              />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
@@ -162,7 +302,7 @@ export default function AssignmentForm() {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Notes"
+                label="Note"
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}

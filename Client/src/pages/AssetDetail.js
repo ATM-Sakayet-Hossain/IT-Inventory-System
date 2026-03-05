@@ -62,6 +62,23 @@ export default function AssetDetail() {
     return <Typography>Asset not found</Typography>;
   }
 
+  const hardware = asset.hardwareSpecifications || asset.hardware;
+
+  const purchaseDate = asset.warranty?.purchaseDate
+    ? new Date(asset.warranty.purchaseDate)
+    : asset.purchaseDate
+    ? new Date(asset.purchaseDate)
+    : null;
+
+  const warrantyExpiry = asset.warranty?.expiryDate
+    ? new Date(asset.warranty.expiryDate)
+    : asset.warrantyExpiry
+    ? new Date(asset.warrantyExpiry)
+    : null;
+
+  const warrantyPeriod = asset.warranty?.period || asset.warranty;
+  const warrantyStatus = asset.warranty?.status || asset.warrantyStatus;
+
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -157,23 +174,43 @@ export default function AssetDetail() {
                   {asset.assignedTo ? `${asset.assignedTo.name} (${asset.assignedTo.email})` : 'Unassigned'}
                 </Typography>
               </Grid>
-              {asset.purchaseDate && (
+              {purchaseDate && (
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body2" color="text.secondary">
                     Purchase Date
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {format(new Date(asset.purchaseDate), 'MMM dd, yyyy')}
+                    {format(purchaseDate, 'MMM dd, yyyy')}
                   </Typography>
                 </Grid>
               )}
-              {asset.warrantyExpiry && (
+              {warrantyExpiry && (
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body2" color="text.secondary">
                     Warranty Expiry
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {format(new Date(asset.warrantyExpiry), 'MMM dd, yyyy')}
+                    {format(warrantyExpiry, 'MMM dd, yyyy')}
+                  </Typography>
+                </Grid>
+              )}
+              {warrantyPeriod && (
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body2" color="text.secondary">
+                    Warranty
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {warrantyPeriod}
+                  </Typography>
+                </Grid>
+              )}
+              {warrantyStatus && (
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body2" color="text.secondary">
+                    Warranty Status
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {warrantyStatus}
                   </Typography>
                 </Grid>
               )}
@@ -187,8 +224,138 @@ export default function AssetDetail() {
                   </Typography>
                 </Grid>
               )}
+              {asset.remarks && (
+                <Grid item xs={12}>
+                  <Typography variant="body2" color="text.secondary">
+                    Remarks
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {asset.remarks}
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
           </Paper>
+          {hardware && (
+            <Paper sx={{ p: 3, mt: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Hardware Specifications
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                {hardware.ram && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      RAM
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.ram}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.cpu && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      CPU
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.cpu}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.cpuGeneration && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      CPU Generation
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.cpuGeneration}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.ssdSize && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      SSD Size
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.ssdSize}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.hddSize && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      HDD Size
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.hddSize}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.motherboard && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Motherboard
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.motherboard}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.motherboardModel && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Motherboard Model
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.motherboardModel}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.gpu && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      GPU
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.gpu}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.macAddress && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      MAC Address
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.macAddress}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.ipAddress && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      IP Address
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.ipAddress}
+                    </Typography>
+                  </Grid>
+                )}
+                {hardware.monitorSize && (
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Monitor Size
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      {hardware.monitorSize}
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </Paper>
+          )}
         </Grid>
         <Grid item xs={12} md={4}>
           <Card>

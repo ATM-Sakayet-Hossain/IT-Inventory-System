@@ -105,6 +105,14 @@ export default function Dashboard() {
             color="#9c27b0"
           />
         </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Warranty Expiring Soon"
+            value={data.assets.warrantyExpiringSoon}
+            icon={<InventoryIcon />}
+            color="#d32f2f"
+          />
+        </Grid>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>

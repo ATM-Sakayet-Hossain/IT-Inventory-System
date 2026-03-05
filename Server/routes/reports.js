@@ -72,11 +72,24 @@ const getDashboardStats = async () => {
       .limit(5);
 
     // Warranty expiring soon
+    const now = new Date();
+    const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
     const warrantyExpiring = await Asset.find({
-      warrantyExpiry: {
-        $lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        $gte: new Date()
-      }
+      $or: [
+        {
+          'warranty.expiryDate': {
+            $lte: in30Days,
+            $gte: now
+          }
+        },
+        {
+          warrantyExpiry: { // backward compatibility for legacy data
+            $lte: in30Days,
+            $gte: now
+          }
+        }
+      ]
     })
       .populate('category', 'name')
       .limit(10);
@@ -89,7 +102,8 @@ const getDashboardStats = async () => {
         underRepair: assetsUnderRepair,
         retired: assetsRetired,
         byCategory: assetsByCategory,
-        byStatus: assetsByStatus
+        byStatus: assetsByStatus,
+        warrantyExpiringSoon: warrantyExpiring.length
       },
       users: {
         total: totalUsers

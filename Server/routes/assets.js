@@ -76,8 +76,14 @@ router.get('/:id', protect, async (req, res) => {
 // @desc    Create new asset
 // @access  Private (Admin, IT Staff)
 router.post('/', protect, authorize('Admin', 'IT Staff'), upload.single('image'), [
+  body('assetTag').trim().notEmpty().withMessage('Asset tag is required'),
   body('name').trim().notEmpty().withMessage('Asset name is required'),
   body('category').notEmpty().withMessage('Category is required'),
+  body('serialNumber').trim().notEmpty().withMessage('Serial number is required'),
+  body('purchasePrice').notEmpty().withMessage('Purchase cost is required').bail().isNumeric().withMessage('Purchase cost must be a number'),
+  body('warranty.period').optional().isString().withMessage('Warranty must be a text value'),
+  body('warranty.expiryDate').optional().isISO8601().withMessage('Warranty expiry date must be a valid date'),
+  body('warranty.status').optional().isIn(['Active', 'Expired']).withMessage('Warranty status must be Active or Expired'),
   body('status').optional().isIn(['In Use', 'In Stock', 'Under Repair', 'Retired'])
 ], async (req, res) => {
   const errors = validationResult(req);
@@ -110,6 +116,9 @@ router.post('/', protect, authorize('Admin', 'IT Staff'), upload.single('image')
 
     res.status(201).json({ success: true, data: populatedAsset });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Asset tag and serial number must be unique' });
+    }
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -146,6 +155,9 @@ router.put('/:id', protect, authorize('Admin', 'IT Staff'), upload.single('image
 
     res.json({ success: true, data: asset });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Asset tag and serial number must be unique' });
+    }
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

@@ -101,7 +101,9 @@ export default function Assignments() {
                   <TableCell>
                     {assignment.asset?.assetTag} - {assignment.asset?.name}
                   </TableCell>
-                  <TableCell>{assignment.assignedTo?.name}</TableCell>
+                  <TableCell>
+                    {assignment.assignedTo?.name || assignment.assignToName || 'N/A'}
+                  </TableCell>
                   <TableCell>
                     {format(new Date(assignment.assignedDate), 'MMM dd, yyyy')}
                   </TableCell>

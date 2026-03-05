@@ -37,7 +37,9 @@ export default function AssetForm() {
     purchasePrice: '',
     warrantyExpiry: '',
     vendor: '',
-    description: '',
+    warrantyPeriod: '',
+    warrantyStatus: 'Active',
+    remarks: '',
   });
 
   const fetchCategories = async () => {
@@ -71,11 +73,21 @@ export default function AssetForm() {
         serialNumber: asset.serialNumber || '',
         status: asset.status || 'In Stock',
         location: asset.location || '',
-        purchaseDate: asset.purchaseDate ? asset.purchaseDate.split('T')[0] : '',
+        purchaseDate: asset.warranty?.purchaseDate
+          ? asset.warranty.purchaseDate.split('T')[0]
+          : asset.purchaseDate
+          ? asset.purchaseDate.split('T')[0]
+          : '',
         purchasePrice: asset.purchasePrice || '',
-        warrantyExpiry: asset.warrantyExpiry ? asset.warrantyExpiry.split('T')[0] : '',
+        warrantyExpiry: asset.warranty?.expiryDate
+          ? asset.warranty.expiryDate.split('T')[0]
+          : asset.warrantyExpiry
+          ? asset.warrantyExpiry.split('T')[0]
+          : '',
         vendor: asset.vendor?._id || '',
-        description: asset.description || '',
+        warrantyPeriod: asset.warranty?.period || asset.warranty || '',
+        warrantyStatus: asset.warranty?.status || asset.warrantyStatus || 'Active',
+        remarks: asset.remarks || '',
       });
     } catch (error) {
       toast.error('Failed to load asset');
@@ -103,10 +115,62 @@ export default function AssetForm() {
     setLoading(true);
 
     try {
+      const {
+        assetTag,
+        name,
+        category,
+        brand,
+        model,
+        serialNumber,
+        status,
+        location,
+        purchaseDate,
+        purchasePrice,
+        warrantyExpiry,
+        vendor,
+        warrantyPeriod,
+        warrantyStatus,
+        remarks,
+      } = formData;
+
+      // Basic required-field validation on the client side
+      if (!assetTag || !name || !serialNumber || !purchaseDate || !purchasePrice || !warrantyPeriod || !warrantyExpiry) {
+        toast.error('Please fill all required fields');
+        setLoading(false);
+        return;
+      }
+
       const data = {
-        ...formData,
-        purchasePrice: formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined,
+        assetTag,
+        name,
+        category,
+        brand,
+        model,
+        serialNumber,
+        status,
+        location,
+        purchaseDate: purchaseDate || undefined,
+        purchasePrice: purchasePrice ? parseFloat(purchasePrice) : undefined,
+        vendor: vendor || undefined,
+        remarks,
       };
+
+      const warranty = {
+        period: warrantyPeriod,
+        purchaseDate: purchaseDate || undefined,
+        expiryDate: warrantyExpiry || undefined,
+        status: warrantyStatus || 'Active',
+      };
+
+      Object.keys(warranty).forEach((key) => {
+        if (!warranty[key]) {
+          delete warranty[key];
+        }
+      });
+
+      if (Object.keys(warranty).length > 0) {
+        data.warranty = warranty;
+      }
 
       if (isEdit) {
         await axios.put(`/api/assets/${id}`, data);
@@ -170,16 +234,16 @@ export default function AssetForm() {
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
+                <InputLabel>Asset State</InputLabel>
                 <Select
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  label="Status"
+                  label="Asset State"
                 >
-                  <MenuItem value="In Stock">In Stock</MenuItem>
                   <MenuItem value="In Use">In Use</MenuItem>
-                  <MenuItem value="Under Repair">Under Repair</MenuItem>
+                  <MenuItem value="In Stock">Available</MenuItem>
+                  <MenuItem value="Under Repair">Repair</MenuItem>
                   <MenuItem value="Retired">Retired</MenuItem>
                 </Select>
               </FormControl>
@@ -209,6 +273,7 @@ export default function AssetForm() {
                 name="serialNumber"
                 value={formData.serialNumber}
                 onChange={handleChange}
+                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -229,27 +294,30 @@ export default function AssetForm() {
                 value={formData.purchaseDate}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
+                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Purchase Price"
+                label="Purchase Cost"
                 name="purchasePrice"
                 type="number"
                 value={formData.purchasePrice}
                 onChange={handleChange}
+                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Warranty Expiry"
+                label="Warranty Expiry Date"
                 name="warrantyExpiry"
                 type="date"
                 value={formData.warrantyExpiry}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
+                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -271,14 +339,43 @@ export default function AssetForm() {
               </FormControl>
             </Grid>
             <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Warranty & Remarks
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Description"
-                name="description"
-                value={formData.description}
+                label="Warranty (e.g. 3 Years)"
+                name="warrantyPeriod"
+                value={formData.warrantyPeriod}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Warranty Status</InputLabel>
+                <Select
+                  name="warrantyStatus"
+                  value={formData.warrantyStatus}
+                  onChange={handleChange}
+                  label="Warranty Status"
+                >
+                  <MenuItem value="Active">Active</MenuItem>
+                  <MenuItem value="Expired">Expired</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Remarks"
+                name="remarks"
+                value={formData.remarks}
                 onChange={handleChange}
                 multiline
-                rows={4}
+                rows={3}
               />
             </Grid>
             <Grid item xs={12}>

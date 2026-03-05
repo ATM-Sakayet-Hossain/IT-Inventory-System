@@ -1,5 +1,80 @@
 const mongoose = require('mongoose');
 
+const HardwareSpecificationsSchema = new mongoose.Schema(
+  {
+    ram: {
+      type: String,
+      trim: true
+    },
+    cpu: {
+      type: String,
+      trim: true
+    },
+    cpuGeneration: {
+      type: String,
+      trim: true
+    },
+    ssdSize: {
+      type: String,
+      trim: true
+    },
+    hddSize: {
+      type: String,
+      trim: true
+    },
+    motherboard: {
+      type: String,
+      trim: true
+    },
+    motherboardModel: {
+      type: String,
+      trim: true
+    },
+    gpu: {
+      type: String,
+      trim: true
+    },
+    macAddress: {
+      type: String,
+      trim: true
+    },
+    ipAddress: {
+      type: String,
+      trim: true
+    },
+    monitorSize: {
+      type: String,
+      trim: true
+    }
+  },
+  {
+    _id: false
+  }
+);
+
+const WarrantySchema = new mongoose.Schema(
+  {
+    period: {
+      type: String,
+      trim: true
+    },
+    purchaseDate: {
+      type: Date
+    },
+    expiryDate: {
+      type: Date
+    },
+    status: {
+      type: String,
+      enum: ['Active', 'Expired'],
+      default: 'Active'
+    }
+  },
+  {
+    _id: false
+  }
+);
+
 const AssetSchema = new mongoose.Schema({
   assetTag: {
     type: String,
@@ -41,13 +116,10 @@ const AssetSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  purchaseDate: {
-    type: Date
-  },
   purchasePrice: {
     type: Number
   },
-  warrantyExpiry: {
+  purchaseDate: {
     type: Date
   },
   vendor: {
@@ -75,9 +147,17 @@ const AssetSchema = new mongoose.Schema({
   qrCode: {
     type: String
   },
-  specifications: {
-    type: Map,
-    of: String
+  hardwareSpecifications: {
+    type: HardwareSpecificationsSchema,
+    required: false
+  },
+  warranty: {
+    type: WarrantySchema,
+    required: false
+  },
+  remarks: {
+    type: String,
+    trim: true
   },
   isValid: {
     type: Boolean,
