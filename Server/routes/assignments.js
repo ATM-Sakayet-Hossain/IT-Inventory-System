@@ -20,7 +20,8 @@ router.get('/', protect, async (req, res) => {
       .populate('asset', 'assetTag name category status')
       .populate('assignedTo', 'name email department')
       .populate('assignedBy', 'name email')
-      .sort({ assignedDate: -1 });
+      .sort({ assignedDate: -1 })
+      .lean();
 
     res.json({ success: true, count: assignments.length, data: assignments });
   } catch (error) {

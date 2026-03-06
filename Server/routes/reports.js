@@ -69,7 +69,8 @@ const getDashboardStats = async () => {
       .populate('asset', 'assetTag name')
       .populate('assignedTo', 'name email')
       .sort({ assignedDate: -1 })
-      .limit(5);
+      .limit(5)
+      .lean();
 
     // Warranty expiring soon
     const now = new Date();
@@ -92,7 +93,8 @@ const getDashboardStats = async () => {
       ]
     })
       .populate('category', 'name')
-      .limit(10);
+      .limit(10)
+      .lean();
 
     return {
       assets: {

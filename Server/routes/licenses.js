@@ -20,7 +20,8 @@ router.get('/', protect, async (req, res) => {
     const licenses = await License.find(query)
       .populate('vendor', 'name contactPerson')
       .populate('assignedTo.user', 'name email')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ success: true, count: licenses.length, data: licenses });
   } catch (error) {

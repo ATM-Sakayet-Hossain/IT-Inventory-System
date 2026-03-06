@@ -63,4 +63,9 @@ const LicenseSchema = new mongoose.Schema({
   }
 });
 
+// Indexes for license lookups and reporting
+LicenseSchema.index({ licenseKey: 1 }, { unique: true });
+LicenseSchema.index({ status: 1, expiryDate: 1 });
+LicenseSchema.index({ softwareName: 1, status: 1 });
+
 module.exports = mongoose.model('License', LicenseSchema);

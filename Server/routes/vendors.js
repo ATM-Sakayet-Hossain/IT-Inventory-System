@@ -9,7 +9,10 @@ const { protect, authorize } = require('../middleware/auth');
 // @access  Private (Admin only)
 router.get('/', protect, authorize('Admin'), async (req, res) => {
   try {
-    const vendors = await Vendor.find({ isValid: true }).sort({ name: 1 });
+    const vendors = await Vendor.find({ isValid: true })
+      .sort({ name: 1 })
+      .lean();
+
     res.json({ success: true, count: vendors.length, data: vendors });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

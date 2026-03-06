@@ -41,4 +41,7 @@ const VendorSchema = new mongoose.Schema({
   }
 });
 
+// Indexes to speed up active vendor listings
+VendorSchema.index({ isValid: 1, name: 1 });
+
 module.exports = mongoose.model('Vendor', VendorSchema);

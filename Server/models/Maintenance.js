@@ -60,4 +60,8 @@ const MaintenanceSchema = new mongoose.Schema({
   }
 });
 
+// Indexes to speed up maintenance list and filter queries
+MaintenanceSchema.index({ asset: 1, status: 1, startDate: -1 });
+MaintenanceSchema.index({ status: 1, startDate: -1 });
+
 module.exports = mongoose.model('Maintenance', MaintenanceSchema);

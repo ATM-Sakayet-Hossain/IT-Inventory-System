@@ -69,4 +69,8 @@ const AssignmentSchema = new mongoose.Schema({
   }
 });
 
+// Indexes to optimize lookups and list queries
+AssignmentSchema.index({ status: 1, assignedTo: 1, assignedDate: -1 });
+AssignmentSchema.index({ asset: 1, status: 1 });
+
 module.exports = mongoose.model('Assignment', AssignmentSchema);

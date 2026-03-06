@@ -173,6 +173,12 @@ const AssetSchema = new mongoose.Schema({
   }
 });
 
+// Indexes to optimize common asset queries and reporting
+AssetSchema.index({ isValid: 1, createdAt: -1 });
+AssetSchema.index({ status: 1, category: 1 });
+AssetSchema.index({ assetTag: 1 }, { unique: true });
+AssetSchema.index({ serialNumber: 1 }, { sparse: true, unique: true });
+
 // Generate asset tag if not provided
 AssetSchema.pre('save', async function(next) {
   if (!this.assetTag) {

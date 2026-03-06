@@ -82,6 +82,11 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
+// Indexes to speed up common queries
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ isValid: 1, createdAt: -1 });
+UserSchema.index({ role: 1, isActive: 1 });
+
 // Encrypt password using bcrypt before saving
 UserSchema.pre('save', async function(next) {
   // Only hash the password if it has been modified (or is new)

@@ -6,7 +6,11 @@ const { protect, authorize } = require('../middleware/auth');
 
 router.get('/', protect, authorize('Admin'), async (req, res) => {
   try {
-    const users = await User.find({ isValid: true }).select('-password').sort({ createdAt: -1 });
+    const users = await User.find({ isValid: true })
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .lean();
+
     res.json({ success: true, count: users.length, data: users });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -18,7 +22,7 @@ router.get('/', protect, authorize('Admin'), async (req, res) => {
 // @access  Private (All authenticated users)
 router.get('/:id', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    const user = await User.findById(req.params.id).select('-password').lean();
     if (!user || !user.isValid) {
       return res.status(404).json({ message: 'User not found' });
     }

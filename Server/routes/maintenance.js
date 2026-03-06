@@ -20,7 +20,8 @@ router.get('/', protect, async (req, res) => {
       .populate('vendor', 'name contactPerson')
       .populate('requestedBy', 'name email')
       .populate('assignedTo', 'name email')
-      .sort({ startDate: -1 });
+      .sort({ startDate: -1 })
+      .lean();
 
     res.json({ success: true, count: maintenance.length, data: maintenance });
   } catch (error) {
