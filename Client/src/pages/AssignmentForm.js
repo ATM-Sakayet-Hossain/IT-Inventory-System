@@ -23,7 +23,7 @@ export default function AssignmentForm() {
   const { isITStaff } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [assets, setAssets] = useState([]);
-  const [assetSearch, setAssetSearch] = useState('');
+  const [assetSearch] = useState('');
   const [selectedAssets, setSelectedAssets] = useState([]);
   const [formData, setFormData] = useState({
     assignToName: '',
