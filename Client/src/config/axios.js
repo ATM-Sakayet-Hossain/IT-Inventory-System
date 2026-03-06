@@ -1,9 +1,17 @@
 import axios from 'axios';
 
-// Base URL so frontend talks to correct backend
-const baseURL =
+// Determine raw API root from env or sensible defaults
+const rawBaseURL =
   process.env.REACT_APP_API_URL ||
-  (process.env.NODE_ENV === 'development' ? 'https://it-inventory-system-coral.vercel.app' : '');
+  (process.env.NODE_ENV === 'development'
+    ? 'http://localhost:1993'
+    : 'https://it-inventory-system-coral.vercel.app');
+
+// Normalize so we don't end up with /api/api/... when callers use "/api/..."
+let baseURL = rawBaseURL.replace(/\/+$/, ''); // strip trailing slash
+if (baseURL.endsWith('/api')) {
+  baseURL = baseURL.replace(/\/api$/, '');
+}
 
 // Create axios instance
 const axiosInstance = axios.create({
