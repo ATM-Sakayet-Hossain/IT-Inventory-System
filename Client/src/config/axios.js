@@ -16,7 +16,8 @@ if (baseURL.endsWith('/api')) {
 // Create axios instance
 const axiosInstance = axios.create({
   baseURL,
-  timeout: 10000,
+  // Allow slower backends / cold starts (30s instead of 10s)
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },

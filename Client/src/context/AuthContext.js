@@ -42,9 +42,30 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (error) {
+      const apiMessage =
+        error.response?.data?.message ||
+        error.response?.data?.errors?.[0]?.msg;
+
+      let message = apiMessage;
+      if (!message) {
+        if (!error.response) {
+          // Network / CORS / unreachable backend
+          message = `Network error: ${error.message || 'Unable to reach server'}`;
+        } else {
+          message = 'Login failed';
+        }
+      }
+
+      // Helpful for debugging in browser devtools
+      // eslint-disable-next-line no-console
+      console.error('Login error:', {
+        message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
       return {
         success: false,
-        message: error.response?.data?.message || 'Login failed'
+        message,
       };
     }
   };
