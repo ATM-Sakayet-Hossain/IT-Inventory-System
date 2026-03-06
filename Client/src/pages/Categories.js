@@ -13,6 +13,7 @@ import {
   CircularProgress,
   Button,
   IconButton,
+  TextField,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import axios from '../config/axios';
@@ -25,6 +26,7 @@ export default function Categories() {
   const { isITStaff, isAdmin } = useContext(AuthContext);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchCategories();
@@ -63,15 +65,23 @@ export default function Categories() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Categories</Typography>
-        {isAdmin && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/categories/new')}
-          >
-            Add Category
-          </Button>
-        )}
+        <Box display="flex" gap={2} alignItems="center">
+          <TextField
+            size="small"
+            label="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {isAdmin && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate('/categories/new')}
+            >
+              Add Category
+            </Button>
+          )}
+        </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
@@ -96,7 +106,15 @@ export default function Categories() {
                 </TableCell>
               </TableRow>
             ) : (
-              categories.map((category) => (
+              categories
+                .filter((category) => {
+                  const q = search.toLowerCase();
+                  if (!q) return true;
+                  const name = category.name?.toLowerCase() || '';
+                  const desc = category.description?.toLowerCase() || '';
+                  return name.includes(q) || desc.includes(q);
+                })
+                .map((category) => (
                 <TableRow key={category._id}>
                   <TableCell>{category.name}</TableCell>
                   <TableCell>{category.description || 'N/A'}</TableCell>

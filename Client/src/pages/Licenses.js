@@ -14,6 +14,7 @@ import {
   Chip,
   Button,
   IconButton,
+  TextField,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import axios from '../config/axios';
@@ -34,6 +35,7 @@ export default function Licenses() {
   const { isITStaff } = useContext(AuthContext);
   const [licenses, setLicenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchLicenses();
@@ -54,15 +56,23 @@ export default function Licenses() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Software Licenses</Typography>
-        {isITStaff && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/licenses/new')}
-          >
-            Add License
-          </Button>
-        )}
+        <Box display="flex" gap={2} alignItems="center">
+          <TextField
+            size="small"
+            label="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {isITStaff && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate('/licenses/new')}
+            >
+              Add License
+            </Button>
+          )}
+        </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
@@ -90,7 +100,24 @@ export default function Licenses() {
                 </TableCell>
               </TableRow>
             ) : (
-              licenses.map((license) => (
+              licenses
+                .filter((license) => {
+                  const q = search.toLowerCase();
+                  if (!q) return true;
+                  const name = license.softwareName?.toLowerCase() || '';
+                  const type = license.licenseType?.toLowerCase() || '';
+                  const status = license.status?.toLowerCase() || '';
+                  const vendor = license.vendor?.name?.toLowerCase() || '';
+                  const key = license.licenseKey?.toLowerCase() || '';
+                  return (
+                    name.includes(q) ||
+                    type.includes(q) ||
+                    status.includes(q) ||
+                    vendor.includes(q) ||
+                    key.includes(q)
+                  );
+                })
+                .map((license) => (
                 <TableRow key={license._id}>
                   <TableCell>{license.softwareName}</TableCell>
                   <TableCell>{license.licenseType}</TableCell>

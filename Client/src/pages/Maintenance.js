@@ -14,6 +14,7 @@ import {
   Chip,
   Button,
   IconButton,
+  TextField,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import axios from '../config/axios';
@@ -35,6 +36,7 @@ export default function Maintenance() {
   const { isITStaff, isAdmin, user } = useContext(AuthContext);
   const [maintenance, setMaintenance] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchMaintenance();
@@ -55,13 +57,21 @@ export default function Maintenance() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Maintenance Records</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/maintenance/new')}
-        >
-          Request Maintenance
-        </Button>
+        <Box display="flex" gap={2} alignItems="center">
+          <TextField
+            size="small"
+            label="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/maintenance/new')}
+          >
+            Request Maintenance
+          </Button>
+        </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
@@ -90,7 +100,26 @@ export default function Maintenance() {
                 </TableCell>
               </TableRow>
             ) : (
-              maintenance.map((record) => (
+              maintenance
+                .filter((record) => {
+                  const q = search.toLowerCase();
+                  if (!q) return true;
+                  const assetTag = record.asset?.assetTag?.toLowerCase() || '';
+                  const assetName = record.asset?.name?.toLowerCase() || '';
+                  const type = record.maintenanceType?.toLowerCase() || '';
+                  const desc = record.description?.toLowerCase() || '';
+                  const requestedBy = record.requestedBy?.name?.toLowerCase() || '';
+                  const status = record.status?.toLowerCase() || '';
+                  return (
+                    assetTag.includes(q) ||
+                    assetName.includes(q) ||
+                    type.includes(q) ||
+                    desc.includes(q) ||
+                    requestedBy.includes(q) ||
+                    status.includes(q)
+                  );
+                })
+                .map((record) => (
                 <TableRow key={record._id}>
                   <TableCell>
                     {record.asset?.assetTag} - {record.asset?.name}

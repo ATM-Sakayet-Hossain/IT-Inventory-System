@@ -178,7 +178,7 @@ export default function AssignmentForm() {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-                            <FormControl fullWidth required>
+              <FormControl fullWidth>
                 <InputLabel>Asset</InputLabel>
                 <Select
                   name="asset"

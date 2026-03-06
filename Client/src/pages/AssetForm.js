@@ -294,7 +294,6 @@ export default function AssetForm() {
                 value={formData.purchaseDate}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -305,7 +304,6 @@ export default function AssetForm() {
                 type="number"
                 value={formData.purchasePrice}
                 onChange={handleChange}
-                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -317,7 +315,6 @@ export default function AssetForm() {
                 value={formData.warrantyExpiry}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -350,7 +347,6 @@ export default function AssetForm() {
                 name="warrantyPeriod"
                 value={formData.warrantyPeriod}
                 onChange={handleChange}
-                required
               />
             </Grid>
             <Grid item xs={12} md={6}>

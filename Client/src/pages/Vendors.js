@@ -14,6 +14,7 @@ import {
   Button,
   IconButton,
   Chip,
+  TextField,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import axios from '../config/axios';
@@ -26,6 +27,7 @@ export default function Vendors() {
   const { isITStaff, isAdmin } = useContext(AuthContext);
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchVendors();
@@ -60,15 +62,23 @@ export default function Vendors() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Vendors</Typography>
-        {isAdmin && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/vendors/new')}
-          >
-            Add Vendor
-          </Button>
-        )}
+        <Box display="flex" gap={2} alignItems="center">
+          <TextField
+            size="small"
+            label="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {isAdmin && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate('/vendors/new')}
+            >
+              Add Vendor
+            </Button>
+          )}
+        </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
@@ -96,7 +106,24 @@ export default function Vendors() {
                 </TableCell>
               </TableRow>
             ) : (
-              vendors.map((vendor) => (
+              vendors
+                .filter((vendor) => {
+                  const q = search.toLowerCase();
+                  if (!q) return true;
+                  const name = vendor.name?.toLowerCase() || '';
+                  const contact = vendor.contactPerson?.toLowerCase() || '';
+                  const email = vendor.email?.toLowerCase() || '';
+                  const phone = vendor.phone?.toLowerCase() || '';
+                  const status = (vendor.isActive ? 'active' : 'inactive');
+                  return (
+                    name.includes(q) ||
+                    contact.includes(q) ||
+                    email.includes(q) ||
+                    phone.includes(q) ||
+                    status.includes(q)
+                  );
+                })
+                .map((vendor) => (
                 <TableRow key={vendor._id}>
                   <TableCell>{vendor.name}</TableCell>
                   <TableCell>{vendor.contactPerson || 'N/A'}</TableCell>

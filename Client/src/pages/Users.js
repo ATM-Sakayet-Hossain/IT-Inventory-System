@@ -14,6 +14,7 @@ import {
   CircularProgress,
   Button,
   IconButton,
+  TextField,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import axios from '../config/axios';
@@ -32,6 +33,7 @@ export default function Users() {
   const { isAdmin } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -52,15 +54,23 @@ export default function Users() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Users</Typography>
-        {isAdmin && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/users/new')}
-          >
-            Add User
-          </Button>
-        )}
+        <Box display="flex" gap={2} alignItems="center">
+          <TextField
+            size="small"
+            label="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {isAdmin && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate('/users/new')}
+            >
+              Add User
+            </Button>
+          )}
+        </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
@@ -88,7 +98,24 @@ export default function Users() {
                 </TableCell>
               </TableRow>
             ) : (
-              users.map((user) => (
+              users
+                .filter((user) => {
+                  const q = search.toLowerCase();
+                  if (!q) return true;
+                  const name = user.name?.toLowerCase() || '';
+                  const email = user.email?.toLowerCase() || '';
+                  const role = user.role?.toLowerCase() || '';
+                  const dept = user.department?.toLowerCase() || '';
+                  const status = (user.isActive ? 'active' : 'inactive');
+                  return (
+                    name.includes(q) ||
+                    email.includes(q) ||
+                    role.includes(q) ||
+                    dept.includes(q) ||
+                    status.includes(q)
+                  );
+                })
+                .map((user) => (
                 <TableRow key={user._id}>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>

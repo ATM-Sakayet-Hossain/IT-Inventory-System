@@ -14,6 +14,7 @@ import {
   Chip,
   Button,
   IconButton,
+  TextField,
 } from '@mui/material';
 import { Add as AddIcon, Undo as UndoIcon } from '@mui/icons-material';
 import axios from '../config/axios';
@@ -27,6 +28,7 @@ export default function Assignments() {
   const { isITStaff } = useContext(AuthContext);
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchAssignments();
@@ -61,15 +63,23 @@ export default function Assignments() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Assignments</Typography>
-        {isITStaff && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/assignments/new')}
-          >
-            Create Assignment
-          </Button>
-        )}
+        <Box display="flex" gap={2} alignItems="center">
+          <TextField
+            size="small"
+            label="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {isITStaff && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate('/assignments/new')}
+            >
+              Create Assignment
+            </Button>
+          )}
+        </Box>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
@@ -96,7 +106,25 @@ export default function Assignments() {
                 </TableCell>
               </TableRow>
             ) : (
-              assignments.map((assignment) => (
+              assignments
+                .filter((assignment) => {
+                  const q = search.toLowerCase();
+                  if (!q) return true;
+                  const assetTag = assignment.asset?.assetTag?.toLowerCase() || '';
+                  const assetName = assignment.asset?.name?.toLowerCase() || '';
+                  const assignee =
+                    assignment.assignedTo?.name?.toLowerCase() ||
+                    assignment.assignToName?.toLowerCase() ||
+                    '';
+                  const status = assignment.status?.toLowerCase() || '';
+                  return (
+                    assetTag.includes(q) ||
+                    assetName.includes(q) ||
+                    assignee.includes(q) ||
+                    status.includes(q)
+                  );
+                })
+                .map((assignment) => (
                 <TableRow key={assignment._id}>
                   <TableCell>
                     {assignment.asset?.assetTag} - {assignment.asset?.name}
