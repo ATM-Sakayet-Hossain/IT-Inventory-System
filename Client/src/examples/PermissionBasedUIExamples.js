@@ -1,14 +1,3 @@
-/**
- * Frontend Examples: Permission-Based UI Rendering
- * 
- * This file contains practical React component examples showing
- * how to conditionally render UI elements based on user permissions.
- */
-
-// ============================================================================
-// EXAMPLE 1: Simple Permission Check in Component
-// ============================================================================
-
 import React, { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Box, Button, Card, Typography } from '@mui/material';
@@ -38,10 +27,6 @@ export function DashboardExample1() {
     </Box>
   );
 }
-
-// ============================================================================
-// EXAMPLE 2: Using Permission Utility Functions
-// ============================================================================
 
 import { 
   hasModulePermission, 
@@ -78,9 +63,6 @@ export function DashboardExample2() {
   );
 }
 
-// ============================================================================
-// EXAMPLE 3: Permission-Aware Reports Card Component
-// ============================================================================
 
 export function ReportsCard() {
   const { user } = useContext(AuthContext);
@@ -122,9 +104,6 @@ export function ReportsCard() {
   );
 }
 
-// ============================================================================
-// EXAMPLE 4: Menu with Permission-Based Items
-// ============================================================================
 
 import { 
   List, 
@@ -201,9 +180,6 @@ export function ReportsMenu() {
   );
 }
 
-// ============================================================================
-// EXAMPLE 5: Permission-Based Buttons in Data Table
-// ============================================================================
 
 import { Table, TableBody, TableCell, TableHead, TableRow, IconButton } from '@mui/material';
 import { Download, Share, Delete } from '@mui/icons-material';
@@ -306,9 +282,6 @@ export function ReportsTable() {
   );
 }
 
-// ============================================================================
-// EXAMPLE 6: Permission-Based Alert/Warning
-// ============================================================================
 
 import { Alert, AlertTitle } from '@mui/material';
 
@@ -352,9 +325,6 @@ export function ReportsPageHeader() {
   );
 }
 
-// ============================================================================
-// EXAMPLE 7: Role Badge with Permission Indicator
-// ============================================================================
 
 import { Chip, Box } from '@mui/material';
 
@@ -396,9 +366,6 @@ export function UserPermissionBadge() {
   );
 }
 
-// ============================================================================
-// EXAMPLE 8: Export/Download Feature with Permission Check
-// ============================================================================
 
 export function ReportsExportButton() {
   const { user } = useContext(AuthContext);
@@ -464,9 +431,6 @@ export function ReportsExportButton() {
   );
 }
 
-// ============================================================================
-// EXAMPLE 9: Complete Reports Page with All Features
-// ============================================================================
 
 export function CompleteReportsPage() {
   const { user } = useContext(AuthContext);
@@ -532,9 +496,6 @@ export function CompleteReportsPage() {
   );
 }
 
-// ============================================================================
-// EXPORT: All Example Components
-// ============================================================================
 
 export {
   DashboardExample1,

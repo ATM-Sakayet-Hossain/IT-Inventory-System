@@ -16,7 +16,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
-import axios from 'axios';
+import axios from '../config/axios';
 import { toast } from 'react-toastify';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';

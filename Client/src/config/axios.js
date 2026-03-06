@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-// Create axios instance - use proxy in development
+// Base URL so frontend talks to correct backend
+const baseURL =
+  process.env.REACT_APP_API_URL ||
+  (process.env.NODE_ENV === 'development' ? 'https://it-inventory-system-coral.vercel.app' : '');
+
+// Create axios instance
 const axiosInstance = axios.create({
+  baseURL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

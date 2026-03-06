@@ -12,7 +12,7 @@ import {
   Chip,
 } from '@mui/material';
 
-import axios from 'axios';
+import axios from '../config/axios';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 

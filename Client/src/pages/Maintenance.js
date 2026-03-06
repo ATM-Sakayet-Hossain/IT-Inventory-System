@@ -16,7 +16,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
-import axios from 'axios';
+import axios from '../config/axios';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import { useContext } from 'react';

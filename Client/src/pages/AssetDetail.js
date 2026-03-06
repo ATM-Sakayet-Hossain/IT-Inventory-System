@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import QRCode from 'react-qr-code';
-import axios from 'axios';
+import axios from '../config/axios';
 import { toast } from 'react-toastify';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';

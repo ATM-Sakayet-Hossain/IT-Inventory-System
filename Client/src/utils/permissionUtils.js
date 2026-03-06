@@ -3,7 +3,7 @@
  * File: Client/src/utils/permissionUtils.js
  */
 
-import axios from 'axios';
+import axios from '../config/axios';
 
 /**
  * Check if user has module permission

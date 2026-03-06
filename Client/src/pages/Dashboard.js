@@ -14,7 +14,7 @@ import {
   Assignment as AssignmentIcon,
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
-import axios from 'axios';
+import axios from '../config/axios';
 import { toast } from 'react-toastify';
 
 const StatCard = ({ title, value, icon, color }) => (
